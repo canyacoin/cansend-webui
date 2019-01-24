@@ -1,0 +1,21 @@
+@import '~app.style/_colors';
+@import '~app.elements/icon/icon.mixins';
+//@import '../../../style/_colors.scss';
+
+.element.social{
+	display: flex;
+	align-items: center;
+	margin: 0;
+	padding: 0;
+	font-size: 1.6rem;
+	
+	a{
+		//margin: 0 0.2em;
+		display: inline-block;
+	}
+
+	.icon{
+		display: block;
+		//@include icon\color($icon : $color-dark)
+	}
+}

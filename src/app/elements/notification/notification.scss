@@ -1,0 +1,45 @@
+@import '../../../style/_colors.scss';
+
+.element.notification{
+	display: block;
+
+	.item{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background: rgba(255,0,0,0.1);
+		padding: 0 1em;
+		font-size: 1.8rem;
+		border-radius: 0.3rem;
+		max-height: 0;
+		overflow: hidden;
+
+		&[data-type='success']{
+			background: rgba($color-success, 0.15);
+			color: darken($color-success, 30%);
+		}
+
+		&[data-type='warning']{
+			background: rgba($color-warning, 0.38);
+			color: darken($color-warning, 50%);
+		}
+
+		&[data-type='notification']{
+			background: rgba($color-info, 0.2);
+			color: darken($color-info, 10%);
+		}
+
+		&[data-open="true"]{
+			max-height: 5rem;
+			padding: 0.9em 1em;
+		}
+
+		& + .item{
+			margin-top: 0.3em;
+		}
+
+		.icon.close{
+			position: absolute;
+		}
+	}
+}

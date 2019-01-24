@@ -1,0 +1,33 @@
+@import '~app.style/_colors';
+@import '~app.style/_variables';
+
+.component.panel{
+	margin: 3rem auto;
+	
+	header{
+		display: flex;
+		align-items : center;
+		justify-content: space-between;
+		margin: 1.5rem 3rem 1rem 3rem;
+
+		.title{
+			margin: 0;
+			font-size: $h5
+		}
+
+		.controls{
+			.field[data-type="select"]{
+				font-size: $psmallest;
+				.current{
+					padding-left: 2em;
+				}
+			}
+		}
+	}
+
+	>.content{
+		background: $color-white;
+		padding: 3rem 3rem;
+		
+	}
+}

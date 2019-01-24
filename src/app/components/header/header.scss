@@ -1,0 +1,95 @@
+@import '../../../style/_colors.scss';
+@import '../../elements/button/button.mixin.scss';
+
+.component.header {
+  position: fixed;
+  top: 0;
+  box-shadow: 0 0 10px 0px rgba(0,0,0,0.1);
+  z-index: 999;
+  background: $color-white;
+  display: block;
+  width: 100%;
+  display: block;
+  padding: 2rem 6rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+  letter-spacing: 1.2px;
+
+  .inner {
+    max-width: 114rem;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+  }
+
+  .left,
+  .right {
+    width: 50%;
+  }
+
+  .left {
+    text-align: left;
+    display: flex;
+    align-items: center;
+
+    > * {
+      display: inline-block;
+    }
+
+    h1 {
+      max-width: 12rem;
+      margin: 0;
+
+      .link {
+        padding: 0;
+      }
+
+      img {
+        display: block;
+      }
+    }
+
+    nav {
+      margin-left: 1rem;
+      a {
+        font-size: 1.2rem;
+        margin-left: 2rem;
+      }
+    }
+  }
+
+  .right {
+    text-align: right;
+
+    .link,
+    .button {
+      margin-left: 1.5em;
+    }
+
+    .link {
+      // padding: 0 1rem 0 1rem;
+      color: $color-grey;
+      transition: 250ms ease-in-out;
+      font-weight: 600;
+      font-size: 1.35rem;
+      display: inline-flex;
+      align-items: center;
+      &:hover {
+        color: $color-black;
+      }
+    }
+
+    .button {
+      @include button\size('xlarge');
+      background-color: $color-blue;
+      color: $color-white;
+      font-size: 1.35rem;
+      &.outline {
+        @include button\color($text: $color-blue, $border: $color-blue, $background: transparent );
+        &:hover {
+          @include button\color($text: $color-white, $border: $color-blue, $background: $color-blue );
+        }
+      }
+    }
+  }
+}

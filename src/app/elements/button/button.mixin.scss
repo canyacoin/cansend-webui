@@ -1,0 +1,21 @@
+@import '../../../style/_colors.scss';
+
+@mixin button\color($text: $color-blue, $border: $color-blue, $background: transparent){
+	color: $text;
+	border-color: $border;
+	background: $background;
+}
+
+@mixin button\size($size){
+	@if $size == 'small' { font-size: 1.2em } 
+	@else if $size == 'medium' { font-size: 1.4em } 
+	@else if $size == 'large' { font-size: 1.6em } 
+	@else if $size == 'xlarge' { font-size: 1.8em }
+}
+
+@mixin button\disabled(){
+	@include button\color($text: $color-cool-grey, $border: $color-cool-grey, $background: transparent );
+	cursor: not-allowed;
+	pointer-events: none;
+	opacity: 0.5;
+}

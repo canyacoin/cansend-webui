@@ -1,0 +1,32 @@
+@import '../../../style/_colors.scss';
+@import './button.mixin.scss';
+
+.element.button{
+	font-family: 'Montserrat', sans-serif;
+	border: 1px solid;
+	border-radius: 5px;
+	padding: 0.5em 0.8em;
+	color: $color-blue;
+	transition: 0.5s;
+	font-weight: 700;
+	text-transform: uppercase;
+	display: inline-block;
+
+	@include button\color($text: $color-white, $border: $color-blue, $background: $color-blue );
+	@include button\size('medium');
+
+	&:hover{
+		box-shadow: 0 2px 10px rgba($color-blue, 0.4)
+	}
+
+	&.outline {
+		@include button\color($text: $color-blue, $border: $color-blue, $background: transparent );
+		&:hover {
+			@include button\color($text: $color-white, $border: $color-blue, $background: $color-blue );
+		}
+	}
+
+	&.disabled{
+		@include button\disabled();
+	}
+}

@@ -1,0 +1,62 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700);
+@import './_mixins.scss';
+@import './_colors.scss';
+@import './_variables.scss';
+
+html{
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 400;
+	font-size: 10px;
+	color: $color-greyish-brown;
+
+	// responisve sizing
+	@media only screen and (max-width: 1180px) {font-size: 9.5px}
+	@media only screen and (max-width: 1020px) {font-size: 9px}
+	@media only screen and (max-width: 900px) {font-size: 8.5px}
+	@media only screen and (max-width: 700px) {font-size: 8px} // mobile/tablet BP
+}
+
+
+h1,h2,h3,h4,h5,h6,p,ul,ol{
+	margin: 0 0 0.6em 0;
+	line-height: 1.25em;
+	font-weight: 400;
+
+	&.light{ font-weight: 300 }
+	strong{ font-weight: 700 }
+	strong.xtra{ font-weight: 700 }
+}
+
+// text gradients webkit hack
+h1,h2,h3,h4,h5,h6,p,a{
+	&[style*="background: linear-gradient("],
+	&[style*="background: radial-gradient("],
+	&[style*="background-image: linear-gradient("],
+	&[style*="background-image: radial-gradient("]{
+		-webkit-background-clip: text !important;
+		background-clip: text !important;
+		-webkit-text-fill-color: transparent !important;
+		text-fill-color: transparent !important;
+		padding-bottom: 0.1em !important;
+	}
+}
+
+h1{ font-size: $h1 }
+h2{ font-size: $h2 }
+h3{ font-size: $h3 }
+h4{ font-size: $h4 }
+h5{ font-size: $h5 }
+h6{ font-size: $h6 }
+p,ul,ol,table,a{ font-size: $p }
+p,ul,ol{
+	margin-bottom: 1em;
+	line-height: 1.45em;
+	a{
+		color: $color-blue;
+		font-size: inherit;
+		font-weight: inherit;
+		&:hover{
+			color: darken($color-blue, 30%);
+		}
+	}
+}

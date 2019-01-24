@@ -1,0 +1,606 @@
+@import '../../../style/_colors';
+@import '../icon/icon.mixins';
+
+.element.formless{
+	font: inherit;
+	font-size: 1.2rem;
+	width: 100%;
+	color: $color-dark;
+
+	.-column{
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		
+		& + .-column{
+			margin: 0 0 0 2rem;
+		}
+	}
+
+	.-row{
+		display: flex;
+		width: 100%;
+		margin: 0;
+		justify-content: flex-end;
+		align-items: center;
+
+		& + .-row{
+			margin: 1rem 0 0 0;
+		}
+
+		>*{
+			width: 100%;
+		}
+
+		//&:first-child{ margin-top: 0 }
+		//&:last-child{ margin-bottom: 0 }
+	}
+
+	.-structure{
+		display: block;
+		
+		&.repeater{
+			width: 100%;
+
+			.repeater-header{
+				display: flex;
+				background: $color-dark;
+				color: $color-white;
+				border-radius: 0.3rem 0.3rem 0 0;
+
+				span{
+					padding: 0.4em 0.5em;
+					font-size: 1.2rem;
+				}
+			}
+
+			.repeater-items{
+				border: 1px solid $color-grey;
+				border-radius: 0 0 0.3rem 0.3rem;
+				margin-bottom: 0.6em;
+
+				.field{
+					margin: 0;
+					border-right: 1px solid rgba($color-grey, 0.2);;
+
+					&:last-of-type{
+						border: none;
+					}
+
+					.field-content{
+						padding: 0.1em 0.5em;
+						&:after{
+							border-bottom-color: rgba($color-grey, 0.2);
+						}
+					}
+				}
+			}
+			
+			.repeater-row{
+				display: flex;
+				justify-content: center;
+				position: relative;
+				overflow: hidden;
+
+				>.field{
+					width: 50%;
+				}
+
+				.icon.delete{
+					@include icon\color($icon : $color-warning, $background : transparent);
+					@include icon\size(1.5rem);
+					position: absolute;
+					top: 50%;
+					right: -1.5em;
+					transform: translateY(-50%) rotate(45deg);
+					width: 1.5rem;
+					height: 1.5rem;
+					transition: right 0.2s;
+					
+				}
+
+				&:hover{
+					.icon.delete{
+						right: 0.75em;
+					}
+				}
+			}
+
+			.repeater-clear,
+			.repeater-add{
+				font-family: 'Montserrat', sans-serif;
+				text-align: right;
+				background: none;
+				border: none;
+				color: $color-blue;
+				font-size: 1.8rem;
+				cursor: pointer;
+			}
+
+			.repeater-clear{
+				font-family: 'Montserrat', sans-serif;
+				font-size: 1.2rem;
+				text-transform: uppercase;
+				float: right;
+				cursor: pointer;
+				color: $color-neutral;
+				display: flex;
+				align-items: center;
+
+				.icon{
+					margin-left: 0.5em;
+					transform: rotate(-45deg);
+					width: 1.2em;
+					height: 1.2em;
+				}
+
+				&:hover{
+					color: $color-warning;
+				}
+			}
+
+			.repeater-controls{
+				text-align: right;
+			}
+
+			.field[data-status="error"]{
+				.field-content {
+					* {
+						color: $color-red;
+					}
+				}
+
+				input{
+					&::-webkit-input-placeholder {color: lighten($color-red, 20%)}
+					&::-moz-placeholder {color: lighten($color-red, 20%)}
+					&:-ms-input-placeholder {color: lighten($color-red, 20%)}
+					&:-moz-placeholder {color: lighten($color-red, 20%)}
+				}
+			}
+		}
+	}
+
+
+
+	.field{
+		margin: 0 1rem;
+		margin-bottom: 1.5em;
+		display: block;
+
+		.field-content{
+			font-size: 1.6rem;
+		}
+
+		// field type input
+		&[data-type="input"],
+		&[data-type="colorpicker"]{
+			.field-content:after{
+				content: '';
+				position: absolute;
+				top: 100%;
+				left: 0;
+				width: 100%;
+				height: 0;
+				border-bottom: 1px solid $color-grey;
+			}
+		}
+
+		&:first-child{margin-left: 0}
+		&:last-child{margin-right: 0}
+
+		// & + .field{
+		// 	margin-left: 1rem;
+		// }
+	}
+
+	.fieldlabel {
+		display: block;
+		//font-weight: bold;
+		font-size: 1.8rem;
+		transition: all 0.3s;
+		margin-bottom: 0.6em;
+
+		&.fl-button { 
+			display: inline-block;
+		}
+		
+		.hint{
+			display: inline-block;
+			font-size: 1.4rem;
+			padding: 0 0.5rem;
+			//margin-left: 0.6rem;
+			vertical-align: bottom;
+
+			.icon{
+				width: 1.4rem;
+				height: 1.4rem;
+			}
+		}
+		
+		.message{
+			display: inline-block;
+			font-size: 1rem;
+			margin-left: 0.6rem;
+			font-weight: 400;
+		}
+
+		&[data-allowempty="false"]{
+			&:after{
+				content: '*';
+				color: $color-info;
+				font-weight: 100;
+				opacity: 0.8;
+			}
+		}
+	}
+
+	button[type="submit"]{
+		width: auto;
+		display: inline-block;
+		cursor: pointer;
+	}
+	
+	
+}
+
+
+
+
+.field{
+	display: inline-block;
+	margin-bottom: 0.5em;
+
+	.field-content{
+		display: flex;
+		align-items: center;
+		position: relative;
+		font-size: inherit;
+
+		>*{
+			margin: 0.4em 0.2em;
+			padding: 0;
+			border: none;
+			font: inherit;
+			line-height: 1.4em;
+		}
+
+		.icon{
+			cursor: pointer;
+			height: 1.8rem;
+			opacity: 0.5;
+		}
+	}
+
+	&[data-status="error"] label{
+		color: $color-warning;
+		.icon:before{ background: $color-warning; }
+	}
+
+	&[data-status="success"] label{
+		color: $color-success;
+		.icon:before{ background: $color-success; }
+	}
+
+	&[data-status="saving"]{
+		opacity: 0.5;
+		label.icon:before{ background: $color-neutral; }
+	}
+
+	&[data-status="nochange"] label{ 
+		//color: $color-info;
+		//.icon:before{ background: $color-info; }
+	}
+
+	&[data-editable="false"]{
+
+		cursor: not-allowed;
+		
+		.field-content{
+			opacity: 0.4;
+			pointer-events: none;
+		}
+	}
+
+	// field type toggle
+	.field[data-type="toggle"]{
+		margin-bottom: 1.1rem;
+	}
+}
+
+/*
+	field types
+*/
+
+
+// field type input
+.field[data-type="input"],
+.field[data-type="colorpicker"]{
+
+	&[data-editing="true"]{
+		.field-content > input{
+			background: $color-white;
+			padding: 0 0.5rem;
+		}
+
+		&[data-selfmanaged="false"]{
+			.field-content > input{
+				background: none;
+				padding: 0.2em 0;
+				margin: 0.2em 0
+			}
+		}
+	}
+
+	&[data-error="true"]{
+		input{
+			background: lighten($color-warning, 50%) !important;
+		}
+	}
+
+	.field-content{
+		input{
+			width: 100%;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			&:disabled{
+				color: inherit;
+			}
+		}
+	}
+}
+
+.field[data-type="input"]{
+	.field-content{
+		.icon{
+			width: 0;
+			margin: 0;
+			opacity: 0;
+			transition: opacity 0.3s;
+
+			// TESTING
+			//border-radius: 50%;
+			&.edit:before{} 
+			&.save:before { background: $color-success }
+			&.cancel:before{ background: $color-warning }
+			&.loading:before{ background: $color-info }
+		}
+	}
+
+	&[data-editing="false"]:not([data-status="saving"]){
+		.field-content:hover{
+			.icon.edit{
+				min-width: 1.8rem;
+				margin: 0 0.2em;
+				opacity: 1;
+			}
+		}
+	}
+
+	&[data-editing="true"]{
+		.field-content{
+			.icon.save,
+			.icon.cancel{
+				min-width: 1.8rem;
+				margin: 0 0.2em;
+				opacity: 0.6;
+				&:hover{
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	&[data-status="saving"]{
+		.field-content{
+			.icon.loading{
+				min-width: 1.8rem;
+				margin: 0 0.2em;
+				opacity: 1;
+				animation: spin 1s;
+				animation-iteration-count: infinite;
+			}
+			&:hover{
+				.icon.edit{
+					width: 0 !important;
+					margin: 0 !important;
+				}
+			}
+		}
+	}
+}
+
+.field[data-type="colorpicker"]{
+	.twitter-picker{
+		position: absolute !important;
+		top: 100%;
+		right: -0.4em;
+		z-index: 1;
+		transition: all 0.2s;
+		max-height: 20rem;
+		overflow: visible;
+
+		&.-hide{
+			opacity: 0;
+			pointer-events: none;
+			max-height: 0;
+			overflow: hidden;
+		}
+	}
+}
+
+// field type toggle
+.field[data-type="toggle"]{
+	
+	.field-content{
+
+		span{
+			background: $color-neutral;
+			height: 3.5rem;
+			width: 10rem;
+			position: relative;
+			border-radius: 1.75rem;
+			transition: background 0.2s;
+			cursor: pointer;
+			box-shadow: inset 0 0 0.5rem rgba(0,0,0,0.25);
+			margin-bottom: 0;
+			text-transform: uppercase;
+
+
+			// ball
+			&:before{
+				content: '';
+				position: absolute;
+				width: 3.1rem;
+				height: 3.1rem;
+				top: 0.2rem;
+				left: 0.2rem;
+				background: white;
+				border-radius: 50%;
+				transition: left 0.2s;
+			}
+			
+			// text
+			&:after{
+				content: attr(data-off-label);
+				position: absolute;
+				top: 50%;
+				right: 0.5rem;
+				width: 50%;
+				border-radius: 50%;
+				color: white;
+				font-size: 1.8rem;
+				text-align: center;
+				transform: translateY(-50%);
+				margin: 0;
+				transition: all 0.2s;
+			}
+
+			&[data-value="true"]{
+				background: $color-success;
+
+				&:before{
+					left: auto;
+					left: calc(100% - 3.1rem - 0.2rem);
+				}
+
+				&:after{
+					content: attr(data-on-label);
+					right: calc(100% - 50% - 0.5rem);
+					//transform: translateY(-50%) translateX(100%)
+				}
+			}
+		}
+
+		input{ display: none; }
+	}
+}
+
+.field[data-type="select"]{
+	display: inline-block;
+	font-size: inherit;
+	font-size: 1.6rem;
+	position: relative;
+
+	.content-container{
+		position: relative;
+		margin: 0
+	}
+
+	.current,
+	.option{
+		display: block;
+		cursor: pointer;
+	}
+
+	.current{
+		background: $color-white;
+		border: 1px solid $color-grey;
+		padding: 1em 3.4em 1em 3.4em;
+
+		&:after{
+			content: '';
+			display: inline-block;
+			position: absolute;
+			right: -0.1em;
+			top: 1.3em;
+			transform: translateY(-80%);
+			width: 1.8rem; 
+			height: 1.8rem; 
+			background-image: url(../../../assets/icons/caret.svg);
+			background-position: center;
+			background-size: contain;
+			opacity: 0.3;
+			right: 1.2em;
+			top: 50%;
+			transform: translateY(-50%) rotate(180deg);
+			transition: transform 0.15s ease-in-out;
+		}
+	}
+
+	.options{
+		background: $color-white;
+		max-height: 0;
+		overflow: hidden;
+		transition: all 0.15s ease-in-out;
+		position: absolute;
+		top: 100%;
+		right: 0;
+		display: block;
+		z-index: 1;
+		opacity: 0;
+		border: 1px solid rgba($color-grey, 0.34)
+	}
+
+	.option {
+		position: relative;
+		white-space: nowrap;
+		padding: 1rem 3.4rem 1rem 3.4rem;
+		min-width: 28.4rem; 
+		
+		&:before{
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 0;
+			height: 100%;
+			background: rgba($color-grey, 0.2);
+			transition: all 0.1s ease-in-out;
+			z-index: -1;
+		}	
+
+
+		&:last-child{
+			border: none
+		}
+
+		&:hover{
+			&:before{
+				width: 100%;
+			}
+		}
+
+		&[data-selected="true"]{
+			height: 0;
+			overflow: hidden;
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+
+	
+	.content-container[data-open="true"]{
+		.current{
+			&:after{
+				transform: translateY(-50%) rotate(270deg);
+			}
+		}
+
+		.options{
+			max-height: 20rem;
+			opacity: 1;
+		}
+	}
+}

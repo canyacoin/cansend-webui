@@ -1,0 +1,52 @@
+@import './icon.mixins.scss';
+@import '../../../style/_colors.scss';
+
+.element.icon{
+	display: inline-block;
+	position: relative;
+	font-style: normal;
+	@include icon\color($icon : currentColor);
+	@include icon\size(1em);
+
+	&[data-clickable="true"]{
+		cursor: pointer;
+	}
+
+	&:before{
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 100%;
+		height: 100%;
+		background-position: center;
+		background-size: contain;
+		background-repeat: no-repeat;
+		transform: translate(-50%, -50%);
+		
+		// experimental masking
+		-webkit-mask-position: 50% 50%;
+		-webkit-mask-size: contain;
+		-webkit-mask-repeat: no-repeat;
+	}
+	
+	// itterate through icons and add class definitions
+	@each $icon in $icons {
+		&[data-type="#{nth($icon, 1)}"]:before{
+			
+			// experimental masking
+			-webkit-mask-image: url(#{$root}/#{nth($icon, 1)}.svg); 
+			mask-image: url(#{$root}/#{nth($icon, 1)}.svg);
+			//@include icon\color($icon : currentColor )
+		}
+	}
+
+	&[data-type="sync"]{
+		-webkit-animation: spin 2s infinite linear;
+	}
+}
+
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}

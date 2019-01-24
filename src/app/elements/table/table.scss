@@ -1,0 +1,83 @@
+@import '../../../style/_colors';
+@import '../../../style/_variables';
+@import '~app.elements/icon/icon.mixins';
+
+.element.table{
+	display: block;
+	position: relative;
+
+	table{
+		width: 100%;
+		border-collapse: collapse;
+		font-size: $psmall;
+		text-align: left;
+	}
+
+	thead,
+	tbody{
+		width: 100%;
+		//overflow: hidden;
+	}
+
+	thead {
+		border-bottom: 1px solid lighten($color-grey, 25%);
+		th{
+			white-space: nowrap;
+			padding: 0 1rem 1rem 1rem;
+			font-weight: 500;
+			font-size: $h5;
+			color: $color-greyish-brown;
+		}
+	}
+
+	tr{
+		border-bottom: 1px solid lighten($color-grey, 25%);
+	}
+
+	td{
+		padding: 1em 0.8em;
+
+		.icon{
+			display: block;
+			@include icon\size(1.8em);
+		}
+	}
+
+	a{
+		font-size: inherit;
+		color: $color-blue;
+	}
+
+	&[data-state="initialized"],
+	&[data-state="fetching"],
+	&[data-state="empty"]{
+
+		padding-bottom: 5rem;
+
+		&:after{
+			position: absolute;
+			bottom: 0%;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size: $psmall;
+			color: $color-blue;
+		}
+		
+		tr{
+			border: none;
+		}
+
+		td{
+			//display: block;
+			height: 0;
+			padding: 0;
+			overflow: hidden;
+			font-size:0; margin:0;
+			border: none;
+		}
+	}
+
+	&[data-state="initialized"]:after{ content: 'Loading...' }
+	&[data-state="fetching"]:after{ content: 'Fetching transactions...' }
+	&[data-state="empty"]:after{ content: 'Nothing to display' }
+}

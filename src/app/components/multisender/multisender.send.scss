@@ -1,0 +1,350 @@
+@import '../../../style/_colors';
+@import '../../../style/_variables';
+@import '~app.elements/icon/icon.mixins';
+@import '~app.elements/button/button.mixin';
+
+.multisender.-send{
+	display: block;
+	
+	
+	h4{
+		font-size: $p;
+		color: $color-greyish-brown
+	}
+	
+	.progress,
+	.overview,
+	.summary,
+	.complete{
+		width: 100%;
+		padding: 0;
+		//padding: 3rem 0;
+		max-height: 0;
+		transition: all 1s ease-in-out;
+		overflow: hidden;
+		border-bottom: 0 solid lighten($color-cool-grey, 20%);
+	}
+
+	.complete{
+		text-align: center;
+
+		img{
+			width: 300px;
+			margin: 3rem auto;
+		}
+
+		h1{ font-size: 3.2rem }
+		h5{ margin-bottom: 3rem }
+		p{ color: $color-cool-grey }
+
+		.button{
+			margin: 0 0.5em;
+			@include button\color($text: $color-light, $border: null, $background: $color-blue);
+			@include button\size('xlarge');
+		}
+	}
+
+	.progress{
+		text-align: center;
+		
+
+		>*{
+			display: block;
+			text-align: center;
+			margin: 0 auto;
+		}
+
+		.circles{
+			position: relative;
+		}
+
+		.progresscircle{
+			max-width: 30rem;
+			font-weight: bold;
+			margin: 2rem auto;
+
+			.CircularProgressbar-path{
+				transition: all 0.5s ease 0s;
+				stroke-linecap: initial;
+			}
+
+			&.-send{
+				.CircularProgressbar-text{
+					font-size: 0.8rem;
+					font-weight: 400;
+					transform: translateY(1.4rem);
+				}
+			}
+
+			&.-confirmed{
+				position: absolute;
+				top: 0;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+		}
+
+		p{
+			margin: 0
+		}
+	}
+
+	.overview{
+		display: flex;
+		flex-wrap: wrap;
+		
+		>div{
+			width: 25%;
+			margin: 2rem 0;
+			padding: 0 1rem;
+
+			h4,p{
+				margin: 0;
+			} 
+
+			h4{
+				margin-bottom: 1em;
+			}
+
+			p{
+				font-size: $h1;
+				color: $color-cool-grey
+			}
+		}
+	}
+
+	.summary{
+		>p{
+			display: block;
+			text-align: center;
+		}
+
+		>.transaction-info{
+			display: flex;
+			margin-top: 6.7rem;
+
+			.from{
+				width: 40%;
+				p{
+					color: $color-cool-grey;
+				}
+			}
+
+			.arrow{
+				width: 5%
+			}
+
+			.to{
+				width: 55%;
+
+				.recipients{
+					display: block;
+					position: relative;
+
+					.items{
+						border: 1px solid $color-cool-grey;
+						border-radius: 0.5rem;
+						overflow: hidden;
+						position: relative;
+						//transition: max-height 0.5s;
+						
+						&:after{
+							content: '';
+							position: absolute;
+							bottom: 0;
+							left: 0;
+							width: 100%;
+							height: 0;
+							background: linear-gradient(to top, white, transparent);
+							transition: height 0.3s;
+						}
+
+						.recipient{
+							display: flex;
+							margin: 1rem;
+							color: $color-cool-grey;
+							transition: all 0.2s;
+							opacity: 1;
+							max-height: 10rem;
+							
+							span{
+								font-size: $p;
+								
+								&:first-child{ width: 85% }
+								
+								&:last-child{ 
+									width: 15%; 
+									padding-right: 3rem;
+									position: relative;
+
+									.icon{
+										position: absolute;
+										right: 0;
+										top: 50%;
+										transform: translateY(-50%);
+										display: none;
+									}
+								}
+							}
+
+							&[data-status="processing"]{
+								color: $color-canya-blue;
+								span:last-child {
+									.icon.processing{ display: block }
+								}
+							}
+
+							&[data-status="success"]{
+								color: $color-aqua-marine;
+								span:last-child {
+									.icon.success{ display: block }
+								}
+							}
+
+							&[data-status="confirmed"]{
+								color: $color-dark;
+								span:last-child {
+									.icon.confirmed{ display: block }
+								}
+							}
+							
+							&[data-status="failed"]{
+								color: $color-salmon;
+								span:last-child {
+									.icon.failed{ display: block }
+								}
+							}
+
+							&[data-open="false"]{
+								max-height: 0;
+								margin: 0 1rem;
+								opacity: 0;
+							}
+						}
+
+						&[data-has-hidden="true"]:after{
+							height: 20%;
+						}
+					}
+
+
+					.toggle{
+						position: absolute;
+						top: calc(100% + 0.4rem);
+						right: 0.4rem;
+						display: flex;
+						align-items: center;
+						opacity: 0.5;
+						cursor: pointer;
+						
+						>*{
+							margin: 0;
+						}	
+					
+						.icon{
+							margin-left: 0.4em;
+							transition: all 0.3s;
+							@include icon\rotate($deg : 180);
+						}
+
+						&:hover{
+							opacity: 1;
+							color: $color-blue;
+						}
+					}
+
+
+					&[data-open="true"]{
+						.toggle .icon{
+							@include icon\rotate($deg : 0);
+						}
+					}
+
+					
+				}
+
+				.gas-price{
+					margin-top: 2rem;
+					display: flex;
+					align-items: center;
+
+					p{
+						margin: 0 0.5em 0 0;
+					}
+
+					.field{
+						width: auto;
+						max-width: 10rem;
+						font-size: $p;
+						margin: 0;
+						font-size: 1.4em;
+
+						input{
+							border: 1px solid $color-cool-grey;
+							padding: 0.2em 0.3em;
+							border-radius: 0.5rem;
+						}
+					}
+
+					.reset{
+						opacity: 0.3;
+						margin-left: 0.5em;
+						transition: all 0.2s;
+						&:hover{
+							opacity: 1;
+							@include icon\color($icon : $color-warning);
+						}
+					}
+				}
+			}
+		}
+
+		.controls{
+			text-align: right;
+		}
+	}
+	
+	
+
+	
+	&[data-status="initialized"]{
+		.overview,
+		.summary{
+			padding: 3rem 0;
+			max-height: 100vh;
+		}
+
+		.summary{
+			max-height: 2000vh;
+		}
+
+		.overview{
+			border-bottom-width: 1px;
+		}
+	}
+
+	&[data-status="processing"]{
+		.progress,
+		.overview,
+		.summary{
+			padding: 3rem 0;
+			max-height: 100vh;
+		}
+
+		.summary{
+			max-height: 300vh;
+		}
+
+		.progress,
+		.overview{
+			border-bottom-width: 1px;
+		}
+	}
+
+	&[data-status="complete"]{
+		.complete{
+			padding: 3rem 0;
+			max-height: 100vh;
+		}
+	}
+}

@@ -1,0 +1,14 @@
+@import '../../../style/_colors.scss';
+
+.component.history{
+
+	.panel + .panel {
+		margin-top: 6vw;
+	}
+
+	.table{
+		.icon[data-type="tick"]:before{ background: $color-greenish-turquoise }
+		.icon[data-type="sync"]:before{ background: $color-grey; opacity: 0.3; }
+		.icon[data-type="spinner"]:before{ background: $color-grey; opacity: 0.5; }
+	}
+}

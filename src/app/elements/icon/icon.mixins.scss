@@ -1,0 +1,48 @@
+@import '../../../style/_colors.scss';
+
+// define all icon names & colors (dark, light, grey, color )
+$icons : (
+	'loading',
+	'question',
+	'caret',
+	'plus-circle',
+	'spinner',
+	'close',
+	'facebook',
+	'twitter',
+	'instagram',
+	'youtube',
+	'github',
+	'telegram',
+	'tick',
+	'cross',
+	'sync',
+	'exclamation'
+);
+
+// define root dir of icon assets
+$root : '../../../assets/icons';
+
+@mixin icon\color($icon : $color-light, $background : transparent){
+	background-color: $background;
+	&:before{ 
+		background-color: $icon;
+		transition: background-color 0.2s ease-in-out;
+	}
+}
+
+@mixin icon\rotate($deg : 0){
+	transform: rotate(#{$deg}deg);
+}
+
+@mixin icon\size($size){
+	width: $size;
+	height: $size;
+}
+
+@mixin icon\padded($percent : 20){
+	&:before{
+		width: unquote((100 - $percent) + '%');
+		height: unquote((100 - $percent) + '%');
+	}
+}

@@ -1,0 +1,23 @@
+@import '../style/_colors.scss';
+
+.app{
+	font-family: 'Montserrat', sans-serif;
+	padding-top: 5rem;
+	background: #f8f8f8;
+
+	.overlay{
+		z-index: 9999;
+	}
+
+	main{
+		max-width: 114rem;
+		margin: 4em auto;
+		min-height: 50.5rem;
+
+		// >.panel{
+		// 	background: $color-white;
+		// 	min-height: 40rem;
+		// 	padding: 4rem 5rem;
+		// }
+	}
+}

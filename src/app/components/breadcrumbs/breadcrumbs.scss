@@ -1,0 +1,82 @@
+@import '../../../style/_colors.scss';
+
+.component.breadcrumbs{
+	display: block;
+	width: 100%;
+	//padding: 0 2rem;
+	padding: 3.6rem 2rem 0;
+	margin-bottom: 3rem;
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+
+	.item{
+		z-index: 1;
+		position: relative;
+		padding-bottom: 4rem;
+		cursor: default;
+
+		strong{
+			display: block;
+			font-size: 3.6rem;
+			background: $color-grey;
+			width: 6rem;
+			height: 6rem;
+			text-align: center;
+			line-height: 6rem;
+			border-radius: 50%;
+			color: $color-white;
+			transition: all 0.2s;
+			transition-delay: 0
+		}
+
+		.title{
+			position: absolute;
+			
+		}
+
+		&[data-active="true"]{
+			cursor: pointer;
+			strong{
+				background: $color-blue;
+				transition-delay: 0.2s
+			}
+		}
+
+		&:after{
+			content: attr(data-title);
+			position: absolute;
+			text-align: center;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			white-space: nowrap;
+			font-weight: 300;
+			text-transform: uppercase;
+			font-size: 1.8rem;
+			color: $color-cool-grey;
+		}
+	}
+
+	.progress{
+		width: 100%;
+		position: absolute;
+		top: 6.1rem;
+		left: calc(5rem);
+		width: calc(100% - 10rem);
+		height: 1rem;
+		z-index: 0;
+		
+		background: rgba($color-cool-grey, 0.22);
+		
+		span{
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 0;
+			background: rgb(204,238,248);
+			transition: width 0.5s;
+		}
+	}
+}

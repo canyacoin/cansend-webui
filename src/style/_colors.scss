@@ -1,0 +1,32 @@
+// colour name definitions
+$color-canya-blue: #33ccff;
+$color-light-blue-grey: #d4eddb;
+$color-aqua-marine: #4decca;
+$color-greenish-turquoise : #00eb8d;
+$color-darkish-green: #185927;
+$color-cool-grey: #919d9d;
+$color-greyish-brown: #535353;
+$color-ice-blue: #f0fbff;
+$color-salmon: #ff6666;
+$color-white: #ffffff;
+$color-black: #000000;
+$color-yellow: #f0b42d;
+
+
+
+// brand colour definitions
+$color-blue: $color-canya-blue;
+$color-green: $color-aqua-marine;
+$color-red: $color-salmon;
+$color-grey: $color-cool-grey;
+$color-dark: $color-greyish-brown;
+$color-light: $color-ice-blue;
+
+// brand gradients
+$brand-gradient: linear-gradient(to right, $color-blue, $color-green);
+
+// state definitions
+$color-success: $color-greenish-turquoise;
+$color-warning: $color-salmon;
+$color-info: $color-blue;
+$color-neutral: $color-grey;

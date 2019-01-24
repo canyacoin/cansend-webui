@@ -1,0 +1,12 @@
+@import '../../../style/_colors.scss';
+
+.component.terms{
+	p{
+		font-size: 1.4rem;
+		color: $color-cool-grey;
+		
+		&:last-child{
+			margin: 0;
+		}
+	}
+}

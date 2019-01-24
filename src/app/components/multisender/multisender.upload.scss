@@ -1,0 +1,40 @@
+@import '~app.style/_colors';
+@import '~app.elements/icon/icon.mixins';
+
+.multisender.-upload{
+	width: 100%;
+	margin: 0 auto;
+	
+	.-row.controls{
+		margin-top: 5rem !important;
+	}
+  .field-content {
+    .element.icon {
+      opacity: 0.5;
+      cursor: auto;
+      @include icon\size(1.2em);
+
+      &[data-type="tick"]:before{ background: $color-success }
+      &[data-type="exclamation"]:before{ background: $color-warning }
+    }
+
+    .prefix{
+      margin: 0.2em 0.3em 0 0;
+    }
+
+    .suffix{
+      color: $color-success
+    }
+  }
+  .overlay-message {
+    padding: 20px;
+    font-size: 1.5rem;
+  }
+}
+
+.contract-link {
+  font-size: 1.2rem;
+  a {
+    font-size: 1em;
+  }
+}

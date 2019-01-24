@@ -1,0 +1,27 @@
+@import '../../../style/_colors.scss';
+
+.component.faqs{
+	.faq{
+		display: block;
+		margin-bottom: 2.4rem;
+
+		.question,
+		.answer{
+			font-size: 1.6rem;
+		}
+
+		.question{
+			font-weight: 500
+		}
+
+		.answer{
+			font-weight: 300
+		}
+	}
+
+	.disclaimer{
+		font-size: 1.4rem;
+		color: $color-cool-grey;
+		margin: 4rem 0 0;
+	}
+}

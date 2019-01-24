@@ -1,0 +1,89 @@
+@import '../../../style/_colors.scss';
+@import '../../elements/button/button.mixin.scss';
+
+.component.footer {
+  display: block;
+  width: 100%;
+  display: block;
+
+  .cta {
+    display: block;
+    text-align: center;
+    background: $brand-gradient;
+    padding: 4.5rem 2rem 3rem;
+    color: $color-light;
+
+    * {
+      margin: 0 auto;
+    }
+
+    img {
+      max-width: 17.2rem;
+    }
+
+    p {
+      margin-top: 2.4rem;
+      font-weight: 600;
+    }
+
+    a {
+      margin-top: 3.3rem;
+      display: inline-block;
+      @include button\color(
+        $text: $color-white,
+        $border: null,
+        $background: $color-blue
+      );
+      @include button\size('medium');
+      text-transform: uppercase;
+      font-weight: bold;
+      padding: 0.8em 1.8em;
+      border-radius: 0.2em;
+      box-shadow: 0 0 3em rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .links {
+    padding: 2rem;
+
+    .inner {
+      max-width: 130rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 auto;
+    }
+
+    .left {
+      img {
+        max-width: 11.3rem;
+        margin: 0;
+      }
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+
+      .link {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: $color-grey;
+        margin-right: 2.8em;
+
+        &:hover {
+          color: $color-blue;
+        }
+      }
+
+      .social {
+        a {
+          margin: 0 0.37em;
+        }
+      }
+      .icon {
+        margin: 1.25rem;
+      }
+    }
+  }
+}
