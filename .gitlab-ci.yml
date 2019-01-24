@@ -31,5 +31,4 @@ deploy:production:
   dependencies:
     - dist:production
   script:
-    - yarn
     - firebase deploy --token "$FIREBASE_CI_AUTH_TOKEN" -P $FIREBASE_PROJECT_ID
