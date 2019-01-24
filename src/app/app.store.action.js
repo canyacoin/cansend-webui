@@ -4,7 +4,6 @@ import { NotificationType } from 'app.elements'
 import { AccountStatus, HistoryStatus, MultisendSummaryStatus, MultisendBatchStatus, MultisendTokenStatus } from 'app/app.store.reducer'
 import { approveMultisender, batchRecipients, countTokens, prepareSend, getWeb3, Contracts, Web3Service, getTokenSymbol, getTokenDecimals, getTokenBalance } from 'app.contract' 
 import config from 'app.config'
-import Units from 'ethereumjs-units'
 
 
 /* redux actions */

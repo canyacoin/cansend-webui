@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link, Social, BancorWidget, CanApps } from 'app.elements'
-import cansend_logo from 'app.images/cansend_logo.svg'
 import canya_logo_main from 'app.images/canya_logo_main.svg'
 import canya_logo from 'app.images/canya_logo@2x.png'
 import './footer.scss'
