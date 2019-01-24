@@ -1,0 +1,35 @@
+image: registry.gitlab.com/canya-com/shared/build-containers/react-container:0.3
+
+variables:
+  APP_PATH: /builds/$CI_PROJECT_PATH
+
+before_script:
+  - cd $APP_PATH
+
+stages:
+  - build
+  - deploy
+
+dist:production:
+  stage: build
+  environment: production
+  only:
+    - master
+  artifacts:
+    name: "cansend-webui build"
+    paths:
+      - $APP_PATH/build
+  script:
+    - yarn
+    - yarn run build
+
+deploy:production:
+  stage: deploy
+  environment: production
+  only:
+    - master
+  dependencies:
+    - dist:production
+  script:
+    - yarn
+    - firebase deploy --token "$FIREBASE_CI_AUTH_TOKEN" -P $FIREBASE_PROJECT_ID
