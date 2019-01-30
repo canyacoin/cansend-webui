@@ -13,15 +13,22 @@ export { default as Web3Service } from './web3'
  *  @param approvedAmount {Number} Number of tokens to approve
  *  @return {Promise<String>} Transaction hash of the approval transaction
  */
-export const approveMultisender = async (tokenAddress, approvedAmount) => {
+export const approveMultisender = async (tokenAddress, tokensToApprove) => {
   const web3 = await Web3Service.getWeb3()
   const tokenContract = await getTokenContract(tokenAddress)
   const accounts = await web3.eth.getAccounts()
-  return new Promise((resolve, reject) => {
-    tokenContract.methods.approve(Contracts.Multisender.address, approvedAmount).send({ from: accounts[0] }, (e, txHash) => {
-      if (e) return reject(e)
-      resolve(txHash)
-    })
+  try {
+    const allowance = await tokenContract.methods.allowance(accounts[0], Contracts.Multisender.address).call();
+    if(new BigNumber(allowance).isGreaterThanOrEqualTo(tokensToApprove)){
+      return Promise.resolve(true)
+    }
+  } catch (e) {
+    return Promise.reject(e)
+  }
+  
+  tokenContract.methods.approve(Contracts.Multisender.address, tokensToApprove).send({ from: accounts[0] }, (e, txHash) => {
+    if (e) return Promise.reject(e)
+    return Promise.resolve(txHash)
   })
 }
 
@@ -36,11 +43,20 @@ export const getDefaultAccount = async () => {
 /**
   TODO : docs
  */
-export const prepareSend = async (tokenAddress, recipients, amounts) => {
+export const prepareSend = async (sender, tokenAddress, recipients, amounts) => {
   if (recipients.length !== amounts.length) throw new Error('Participants and amounts arrays should be equal length')
   if (recipients.length > 255) throw new Error('Arrays cannot be larger than 255 in length, please send multiple transactions')
   const multisendContract = await getMultisendContract()
-  return multisendContract.methods.multiSend(tokenAddress, recipients, amounts);
+  const method = multisendContract.methods.multiSend(tokenAddress, recipients, amounts);
+  
+  try {
+    // estimate gas && ensure func can be sent
+    const gas = await method.estimateGas({ from: sender });
+    return { method, gas };
+  } catch (e) {
+    return { error: JSON.stringify(e) }
+  }
+
 }
 
 /**
