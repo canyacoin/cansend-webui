@@ -308,7 +308,7 @@ export const summariseTransactions = () => {
 		let state = getState();
     let token_count = countTokens(state.multisend.recipients, state.multisend.token_decimal)
     let gasCost = await estimateTransferCost(state.multisend.token_address);
-    const batchSize = gasCost ? Math.floor((config.max_gas_limit - 100000) / gasCost) : (config.tx_batch_size || 150);
+    const batchSize = gasCost ? Math.floor((config.max_gas_limit - 200000) / gasCost) : (config.tx_batch_size || 150);
 		let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, batchSize);
 
 		dispatch(setSummary({

@@ -150,7 +150,7 @@ export const estimateTransferCost = async (tokenAddress) => {
     console.log('Got method');
     const gasCost = await method.estimateGas({ from: accounts[0] });
     console.log(`Estimated gas: ${JSON.stringify(gasCost)}`);
-    return Promise.resolve(gasCost);
+    return Promise.resolve(gasCost + 6000);
   } catch (e) {
     return Promise.resolve(null);
   }
