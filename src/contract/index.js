@@ -39,7 +39,7 @@ export const getDefaultAccount = async () => {
 export const prepareSend = async (tokenAddress, recipients, amounts) => {
   if (recipients.length !== amounts.length) throw new Error('Participants and amounts arrays should be equal length')
   if (recipients.length > 255) throw new Error('Arrays cannot be larger than 255 in length, please send multiple transactions')
-   const multisendContract = await getMultisendContract()
+  const multisendContract = await getMultisendContract()
   return multisendContract.methods.multiSend(tokenAddress, recipients, amounts);
 }
 
@@ -113,7 +113,6 @@ export const getWeb3 = async () => {
 }
 
 
-// TODO - chunk contract recipients into pieces
 export const batchRecipients = (data, decimal, batchSize=200) => {
   let chunks = []
  // let total = new BigNumber(0);
@@ -140,6 +139,22 @@ export const batchRecipients = (data, decimal, batchSize=200) => {
   });
   
   return chunks
+}
+
+export const estimateTransferCost = async (tokenAddress) => {
+  try {
+    const web3 = await Web3Service.getWeb3()
+    const accounts = await web3.eth.getAccounts()
+    const contract = await getTokenContract(tokenAddress)
+    const method = await contract.methods.transfer(accounts[0], 1);
+    console.log('Got method');
+    const gasCost = await method.estimateGas({ from: accounts[0] });
+    console.log(`Estimated gas: ${JSON.stringify(gasCost)}`);
+    return Promise.resolve(gasCost);
+  } catch (e) {
+    return Promise.resolve(null);
+  }
+
 }
 
 export const countTokens = (txs, decimal) => {

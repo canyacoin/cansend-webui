@@ -2,7 +2,7 @@ import md5 from 'md5';
 import BigNumber from 'bignumber.js'
 import { NotificationType } from 'app.elements'
 import { AccountStatus, HistoryStatus, MultisendSummaryStatus, MultisendBatchStatus, MultisendTokenStatus } from 'app/app.store.reducer'
-import { approveMultisender, batchRecipients, countTokens, prepareSend, getWeb3, Contracts, Web3Service, getTokenSymbol, getTokenDecimals, getTokenBalance } from 'app.contract' 
+import { approveMultisender, batchRecipients, countTokens, prepareSend, getWeb3, estimateTransferCost, Contracts, Web3Service, getTokenSymbol, getTokenDecimals, getTokenBalance } from 'app.contract' 
 import config from 'app.config'
 
 
@@ -306,8 +306,10 @@ export const summariseTransactions = () => {
 	return async (dispatch, getState) => {
 
 		let state = getState();
-		let token_count = countTokens(state.multisend.recipients, state.multisend.token_decimal)
-		let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, config.tx_batch_size || 200);
+    let token_count = countTokens(state.multisend.recipients, state.multisend.token_decimal)
+    let gasCost = await estimateTransferCost(state.multisend.token_address);
+    const batchSize = gasCost ? Math.floor((config.max_gas_limit - 100000) / gasCost) : (config.tx_batch_size || 150);
+		let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, batchSize);
 
 		dispatch(setSummary({
 			from_token_address : state.multisend.token_address,
@@ -334,13 +336,14 @@ export const processTransactions = () => {
 		
 		dispatch(setSummary({
 			status : MultisendSummaryStatus.PROCESSING
-		}));
+    }));
 
 		let state = getState();
 		let SENDING_CAN = false
 		const web3 = await Web3Service.getWeb3()
 		const accounts = await web3.eth.getAccounts()
-		const canTokenDecimals = await getTokenDecimals(Contracts.Token.address)
+    const canTokenDecimals = await getTokenDecimals(Contracts.Token.address)
+    
 
 		// get the multisend token address
 		const multisendTokenAddress = state.multisend.token_address.toLowerCase()
@@ -352,12 +355,12 @@ export const processTransactions = () => {
 		if (multisendTokenAddress === canTokenAddress) SENDING_CAN = true
 
 		try {
-
 			if (SENDING_CAN) {
 				tokensToApprove = tokensToApprove.add(state.multisend.summary.can_fee * (Math.pow(10, canTokenDecimals)))
 			} else {
 				await approveMultisender(canTokenAddress, (state.multisend.summary.can_fee * Math.pow(10, canTokenDecimals)))
-			}
+      }
+      
 
 			approveMultisender(state.multisend.summary.from_token_address, tokensToApprove).then( approved => {
 				if(!approved) throw new Error('Not approved!')
@@ -366,40 +369,58 @@ export const processTransactions = () => {
 				state.multisend.summary.batches.forEach( (batch, i) => {
 
 					// prepare the token send method 
-					prepareSend(state.multisend.summary.from_token_address, batch.items.recipients, batch.items.amounts).then( method => {
+					prepareSend(state.multisend.summary.from_token_address, batch.items.recipients, batch.items.amounts).then(method => {
+            
+            // estimate gas && ensure func can be sent
+            method.estimateGas({ from: accounts[0] }).then(gas => {
+              
+              if(gas >= config.max_gas_limit){
+                dispatch(updateBatchStatus(i, {
+                  status : MultisendBatchStatus.ERROR,
+                  message : 'Gas limit exceeded - try reducing the batch size'
+                }))
+                return
+              }
+              // send the tokens with events
+              method.send({ from: accounts[0], gas, gasPrice : state.account.gas_price})
+                            
+                // update on tx hash
+                .on('transactionHash', hash => {
+                  dispatch(updateBatchStatus(i, {
+                    status : MultisendBatchStatus.SENT,
+                    hash : hash
+                  }))
+                })
+
+                // update on confirmation // ?? Do we need this ??
+                // .on('confirmation', (confirmationNumber, receipt) => {
+                //   console.log(confirmationNumber, receipt)
+                // })
+
+                // update on recepit
+                .on('receipt', receipt => {
+                  dispatch(updateBatchStatus(i, {
+                    status : MultisendBatchStatus.CONFIRMED,
+                    receipt : receipt
+                  }))
+                })
+
+                // update on error
+                .on('error', (error, receipt) => {
+                  console.log(error)
+                  dispatch(updateBatchStatus(i, {
+                    status : MultisendBatchStatus.ERROR,
+                    message : error.message
+                  }))
+                });
+            }).catch(e => {
+              dispatch(updateBatchStatus(i, {
+                status : MultisendBatchStatus.ERROR,
+                message : 'Gas estimation failed, this means that there is a problem with this transaction'
+              }))
+            })
+
 						
-						// send the tokens with events
-						method.send({ from: accounts[0], gas: 1000000 + (batch.items.recipients.length * 30000), gasPrice : state.account.gas_price})
-							
-							// update on tx hash
-							.on('transactionHash', hash => {
-								dispatch(updateBatchStatus(i, {
-									status : MultisendBatchStatus.SENT,
-									hash : hash
-								}))
-							})
-
-							// update on confirmation // ?? Do we need this ??
-							// .on('confirmation', (confirmationNumber, receipt) => {
-							//   console.log(confirmationNumber, receipt)
-							// })
-
-							// update on recepit
-							.on('receipt', receipt => {
-								dispatch(updateBatchStatus(i, {
-									status : MultisendBatchStatus.CONFIRMED,
-									receipt : receipt
-								}))
-							})
-
-							// update on error
-							.on('error', (error, receipt) => {
-								console.log(error)
-								dispatch(updateBatchStatus(i, {
-									status : MultisendBatchStatus.ERROR,
-									message : error.message
-								}))
-							});
 					})
 				})
 			}).catch(e => {
