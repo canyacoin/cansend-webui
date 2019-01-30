@@ -370,17 +370,17 @@ export const processTransactions = () => {
 					prepareSend(state.multisend.summary.from_token_address, batch.items.recipients, batch.items.amounts).then(method => {
             
             // estimate gas && ensure func can be sent
-            method.estimateGas({ from: accounts[0] }).then(gas => {
+            // method.estimateGas({ from: accounts[0] }).then(gas => {
               
-              if(gas >= config.max_gas_limit){
-                dispatch(updateBatchStatus(i, {
-                  status : MultisendBatchStatus.ERROR,
-                  message : 'Gas limit exceeded - try reducing the batch size'
-                }))
-                return
-              }
+            //   if(gas >= config.max_gas_limit){
+            //     dispatch(updateBatchStatus(i, {
+            //       status : MultisendBatchStatus.ERROR,
+            //       message : 'Gas limit exceeded - try reducing the batch size'
+            //     }))
+            //     return
+            //   }
               // send the tokens with events
-              method.send({ from: accounts[0], gas, gasPrice : state.account.gas_price})
+              method.send({ from: accounts[0], gas: 1000000 + (batch.items.recipients.length * 40000), gasPrice : state.account.gas_price})
                             
                 // update on tx hash
                 .on('transactionHash', hash => {
@@ -411,12 +411,12 @@ export const processTransactions = () => {
                     message : error.message
                   }))
                 });
-            }).catch(e => {
-              dispatch(updateBatchStatus(i, {
-                status : MultisendBatchStatus.ERROR,
-                message : 'Gas estimation failed, this means that there is a problem with this transaction'
-              }))
-            })
+            // }).catch(e => {
+            //   dispatch(updateBatchStatus(i, {
+            //     status : MultisendBatchStatus.ERROR,
+            //     message : 'Gas estimation failed, this means that there is a problem with this transaction'
+            //   }))
+            // })
 
 						
 					})
