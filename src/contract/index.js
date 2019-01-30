@@ -141,22 +141,6 @@ export const batchRecipients = (data, decimal, batchSize=200) => {
   return chunks
 }
 
-export const estimateTransferCost = async (tokenAddress) => {
-  try {
-    const web3 = await Web3Service.getWeb3()
-    const accounts = await web3.eth.getAccounts()
-    const contract = await getTokenContract(tokenAddress)
-    const method = await contract.methods.transfer(accounts[0], 1);
-    console.log('Got method');
-    const gasCost = await method.estimateGas({ from: accounts[0] });
-    console.log(`Estimated gas: ${JSON.stringify(gasCost)}`);
-    return Promise.resolve(gasCost + 6000);
-  } catch (e) {
-    return Promise.resolve(null);
-  }
-
-}
-
 export const countTokens = (txs, decimal) => {
   let int = txs.reduce((acc, tx) => {return acc += tx.recipient_amount}, 0)
   let bn = new BigNumber(int).mul(Math.pow(10, decimal))

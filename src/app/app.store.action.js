@@ -2,7 +2,7 @@ import md5 from 'md5';
 import BigNumber from 'bignumber.js'
 import { NotificationType } from 'app.elements'
 import { AccountStatus, HistoryStatus, MultisendSummaryStatus, MultisendBatchStatus, MultisendTokenStatus } from 'app/app.store.reducer'
-import { approveMultisender, batchRecipients, countTokens, prepareSend, getWeb3, estimateTransferCost, Contracts, Web3Service, getTokenSymbol, getTokenDecimals, getTokenBalance } from 'app.contract' 
+import { approveMultisender, batchRecipients, countTokens, prepareSend, getWeb3, Contracts, Web3Service, getTokenSymbol, getTokenDecimals, getTokenBalance } from 'app.contract' 
 import config from 'app.config'
 
 
@@ -307,9 +307,7 @@ export const summariseTransactions = () => {
 
 		let state = getState();
     let token_count = countTokens(state.multisend.recipients, state.multisend.token_decimal)
-    let gasCost = await estimateTransferCost(state.multisend.token_address);
-    const batchSize = gasCost ? Math.floor((config.max_gas_limit - 200000) / gasCost) : (config.tx_batch_size || 150);
-		let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, batchSize);
+		let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, config.tx_batch_size || 150);
 
 		dispatch(setSummary({
 			from_token_address : state.multisend.token_address,
