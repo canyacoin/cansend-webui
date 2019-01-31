@@ -380,7 +380,7 @@ export const processTransactions = () => {
             //     return
             //   }
               // send the tokens with events
-              method.send({ from: accounts[0], gas: 1000000 + (batch.items.recipients.length * 40000), gasPrice : state.account.gas_price})
+              method.send({ from: accounts[0], gas: 60000 + (batch.items.recipients.length * 50000), gasPrice : state.account.gas_price})
                             
                 // update on tx hash
                 .on('transactionHash', hash => {
@@ -410,6 +410,7 @@ export const processTransactions = () => {
                     status : MultisendBatchStatus.ERROR,
                     message : error.message
                   }))
+                  dispatch(approvalDenied())
                 });
             // }).catch(e => {
             //   dispatch(updateBatchStatus(i, {

@@ -13,15 +13,27 @@ export { default as Web3Service } from './web3'
  *  @param approvedAmount {Number} Number of tokens to approve
  *  @return {Promise<String>} Transaction hash of the approval transaction
  */
-export const approveMultisender = async (tokenAddress, approvedAmount) => {
+export const approveMultisender = async (tokenAddress, tokensToApprove) => {
   const web3 = await Web3Service.getWeb3()
   const tokenContract = await getTokenContract(tokenAddress)
   const accounts = await web3.eth.getAccounts()
-  return new Promise((resolve, reject) => {
-    tokenContract.methods.approve(Contracts.Multisender.address, approvedAmount).send({ from: accounts[0] }, (e, txHash) => {
-      if (e) return reject(e)
-      resolve(txHash)
-    })
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      const allowance = await tokenContract.methods.allowance(accounts[0], Contracts.Multisender.address).call();
+      const bn = new BigNumber(allowance, 10)
+      if(bn.gte(tokensToApprove)){
+        resolve(true)
+      } else {
+        tokenContract.methods.approve(Contracts.Multisender.address, tokensToApprove).send({ from: accounts[0] }, (e, txHash) => {
+          if (e) reject(e)
+          resolve(txHash)
+        })
+      }
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }    
   })
 }
 
