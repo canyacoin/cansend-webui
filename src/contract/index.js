@@ -23,12 +23,9 @@ export const approveMultisender = async (tokenAddress, tokensToApprove) => {
       const allowance = await tokenContract.methods.allowance(accounts[0], Contracts.Multisender.address).call();
       const bn = new BigNumber(allowance, 10)
       if(bn.gte(tokensToApprove)){
-        resolve(true)
+        resolve({ approved: true })
       } else {
-        tokenContract.methods.approve(Contracts.Multisender.address, tokensToApprove).send({ from: accounts[0] }, (e, txHash) => {
-          if (e) reject(e)
-          resolve(txHash)
-        })
+        resolve({ method: tokenContract.methods.approve(Contracts.Multisender.address, tokensToApprove) })
       }
     } catch (e) {
       console.log(e)

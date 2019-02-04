@@ -1,7 +1,7 @@
 import md5 from 'md5';
 import BigNumber from 'bignumber.js'
 import { NotificationType } from 'app.elements'
-import { AccountStatus, HistoryStatus, MultisendSummaryStatus, MultisendBatchStatus, MultisendTokenStatus } from 'app/app.store.reducer'
+import { AccountStatus, HistoryStatus, MultisendSummaryStatus, MultisendApprovalStatus, MultisendBatchStatus, MultisendTokenStatus } from 'app/app.store.reducer'
 import { approveMultisender, batchRecipients, countTokens, prepareSend, getWeb3, Contracts, Web3Service, getTokenSymbol, getTokenDecimals, getTokenBalance } from 'app.contract' 
 import config from 'app.config'
 
@@ -81,6 +81,12 @@ export const setSummary = (summary) => ({
 
 export const updateBatchStatus = (index, data) => ({
 	type : 'APP.TRANSACTION.BATCH.UPDATE',
+	index : index, 
+	data : data
+})
+
+export const updateApprovalStatus = (index, data) => ({
+	type : 'APP.TRANSACTION.APPROVAL.UPDATE',
 	index : index, 
 	data : data
 })
@@ -307,7 +313,34 @@ export const summariseTransactions = () => {
 
 		let state = getState();
     let token_count = countTokens(state.multisend.recipients, state.multisend.token_decimal)
-		let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, config.tx_batch_size || 150);
+    
+    let SENDING_CAN = false
+		const web3 = await Web3Service.getWeb3()
+    const canTokenDecimals = await getTokenDecimals(Contracts.Token.address)
+    let approvals = [];
+    // get the multisend token address
+    const multisendTokenAddress = state.multisend.token_address.toLowerCase()
+
+    // get the can token address 
+    const canTokenAddress = Contracts.Token.address.toLowerCase()
+
+    let tokensToApprove = state.multisend.summary.token_count_bn
+    if (multisendTokenAddress === canTokenAddress) SENDING_CAN = true
+
+    if (SENDING_CAN) {
+      tokensToApprove = tokensToApprove.add(state.multisend.summary.can_fee * (Math.pow(10, canTokenDecimals)))
+    } else {
+      approvals.push({
+        status: MultisendApprovalStatus.PENDING,
+        token_address: canTokenAddress,
+        amount: (state.multisend.summary.can_fee * Math.pow(10, canTokenDecimals))
+      })
+    }
+    approvals.push({
+      status: MultisendApprovalStatus.PENDING,
+      token_address: state.multisend.summary.from_token_address,
+      amount: tokensToApprove
+    })
 
 		dispatch(setSummary({
 			from_token_address : state.multisend.token_address,
@@ -316,14 +349,8 @@ export const summariseTransactions = () => {
 			address_count : state.multisend.recipients.length,
 			token_count_int : token_count.int,
 			token_count_bn : token_count.bn,
-			status : MultisendSummaryStatus.INITIALIZED,
-			batches : batches.map( batch => ({
-				status : MultisendBatchStatus.PENDING,
-				message : '',
-				items : batch,
-				hash : null,
-				receipt : null
-			}))
+      status : MultisendSummaryStatus.INITIALIZED,
+      approvals,
 		}))
 	}
 }
@@ -333,105 +360,143 @@ export const processTransactions = () => {
 	return async (dispatch, getState) => {
 		
 		dispatch(setSummary({
-			status : MultisendSummaryStatus.PROCESSING
+			status : MultisendSummaryStatus.PROCESSING_APPROVALS
     }));
 
 		let state = getState();
-		let SENDING_CAN = false
 		const web3 = await Web3Service.getWeb3()
 		const accounts = await web3.eth.getAccounts()
-    const canTokenDecimals = await getTokenDecimals(Contracts.Token.address)
-    
-
-		// get the multisend token address
-		const multisendTokenAddress = state.multisend.token_address.toLowerCase()
-
-		// get the can token address 
-		const canTokenAddress = Contracts.Token.address.toLowerCase()
-
-		let tokensToApprove = state.multisend.summary.token_count_bn
-		if (multisendTokenAddress === canTokenAddress) SENDING_CAN = true
 
 		try {
-			if (SENDING_CAN) {
-				tokensToApprove = tokensToApprove.add(state.multisend.summary.can_fee * (Math.pow(10, canTokenDecimals)))
-			} else {
-				await approveMultisender(canTokenAddress, (state.multisend.summary.can_fee * Math.pow(10, canTokenDecimals)))
-      }
-      
+      // iterate each batch
+      state.multisend.summary.approvals.forEach( (approval, i) => {
 
-			approveMultisender(state.multisend.summary.from_token_address, tokensToApprove).then( approved => {
-				if(!approved) throw new Error('Not approved!')
+        approveMultisender(approval.token_address, approval.amount).then( (method, approved) => {
+          if(approved){
+            return dispatch(updateApprovalStatus(i, {
+              status : MultisendApprovalStatus.CONFIRMED
+            }))
+            //TODO - if all approvals are complete, need to begin processing the batches.. think it must require user input
+          } 
 
-				// itterate each batch
-				state.multisend.summary.batches.forEach( (batch, i) => {
+          method.send({ from: accounts[0] })
+            .on('transactionHash', hash => {
+              dispatch(updateApprovalStatus(i, {
+                status : MultisendApprovalStatus.SENT
+              }))
+            })
+            .on('receipt', receipt => {
+              dispatch(updateApprovalStatus(i, {
+                status : MultisendApprovalStatus.CONFIRMED
+              }))
+              if(i >= state.multisend.summary.approvals.length){
+                dispatch(processBatches())
+              }
+            })
+            .on('error', (error, receipt) => {
+              console.log(error)
+              dispatch(updateApprovalStatus(i, {
+                status : MultisendApprovalStatus.ERROR
+              }))
+              dispatch(approvalDenied())
+            });
 
-					// prepare the token send method 
-					prepareSend(state.multisend.summary.from_token_address, batch.items.recipients, batch.items.amounts).then(method => {
-            
-            // estimate gas && ensure func can be sent
-            // method.estimateGas({ from: accounts[0] }).then(gas => {
-              
-            //   if(gas >= config.max_gas_limit){
-            //     dispatch(updateBatchStatus(i, {
-            //       status : MultisendBatchStatus.ERROR,
-            //       message : 'Gas limit exceeded - try reducing the batch size'
-            //     }))
-            //     return
-            //   }
-              // send the tokens with events
-              method.send({ from: accounts[0], gas: 60000 + (batch.items.recipients.length * 50000), gasPrice : state.account.gas_price})
-                            
-                // update on tx hash
-                .on('transactionHash', hash => {
-                  dispatch(updateBatchStatus(i, {
-                    status : MultisendBatchStatus.SENT,
-                    hash : hash
-                  }))
-                })
-
-                // update on confirmation // ?? Do we need this ??
-                // .on('confirmation', (confirmationNumber, receipt) => {
-                //   console.log(confirmationNumber, receipt)
-                // })
-
-                // update on recepit
-                .on('receipt', receipt => {
-                  dispatch(updateBatchStatus(i, {
-                    status : MultisendBatchStatus.CONFIRMED,
-                    receipt : receipt
-                  }))
-                })
-
-                // update on error
-                .on('error', (error, receipt) => {
-                  console.log(error)
-                  dispatch(updateBatchStatus(i, {
-                    status : MultisendBatchStatus.ERROR,
-                    message : error.message
-                  }))
-                  dispatch(approvalDenied())
-                });
-            // }).catch(e => {
-            //   dispatch(updateBatchStatus(i, {
-            //     status : MultisendBatchStatus.ERROR,
-            //     message : 'Gas estimation failed, this means that there is a problem with this transaction'
-            //   }))
-            // })
-
-						
-					})
-				})
-			}).catch(e => {
-				// the user denied the approval transaction for the airdrop token
-				dispatch(approvalDenied())
-			});
-
+          
+        }).catch(e => {
+          // the user denied the approval transaction for the airdrop token
+          dispatch(approvalDenied())
+        });
+      })
 		} catch(e) {
 			// the user denied the approval of the CAN fee
 			dispatch(approvalDenied())
 		}	
 	}
+}
+
+export const processBatches = () => {
+
+	return async (dispatch, getState) => {
+    
+		let state = getState();
+		const web3 = await Web3Service.getWeb3()
+		const accounts = await web3.eth.getAccounts()
+    const canTokenDecimals = await getTokenDecimals(Contracts.Token.address)
+    
+    // let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, config.tx_batch_size || 150);
+
+
+		dispatch(setSummary({
+      status : MultisendSummaryStatus.PROCESSING,
+      // batches : batches.map( batch => ({
+			// 	status : MultisendBatchStatus.PENDING,
+			// 	message : '',
+			// 	items : batch,
+			// 	hash : null,
+			// 	receipt : null
+			// }))
+    }));
+
+    // itterate each batch
+    state.multisend.summary.batches.forEach( (batch, i) => {
+
+      // prepare the token send method 
+      prepareSend(state.multisend.summary.from_token_address, batch.items.recipients, batch.items.amounts).then(method => {
+        
+        // estimate gas && ensure func can be sent
+        // method.estimateGas({ from: accounts[0] }).then(gas => {
+          
+        //   if(gas >= config.max_gas_limit){
+        //     dispatch(updateBatchStatus(i, {
+        //       status : MultisendBatchStatus.ERROR,
+        //       message : 'Gas limit exceeded - try reducing the batch size'
+        //     }))
+        //     return
+        //   }
+          // send the tokens with events
+          method.send({ from: accounts[0], gas: 60000 + (batch.items.recipients.length * 50000), gasPrice : state.account.gas_price})
+                        
+            // update on tx hash
+            .on('transactionHash', hash => {
+              dispatch(updateBatchStatus(i, {
+                status : MultisendBatchStatus.SENT,
+                hash : hash
+              }))
+            })
+
+            // update on confirmation // ?? Do we need this ??
+            // .on('confirmation', (confirmationNumber, receipt) => {
+            //   console.log(confirmationNumber, receipt)
+            // })
+
+            // update on recepit
+            .on('receipt', receipt => {
+              dispatch(updateBatchStatus(i, {
+                status : MultisendBatchStatus.CONFIRMED,
+                receipt : receipt
+              }))
+            })
+
+            // update on error
+            .on('error', (error, receipt) => {
+              console.log(error)
+              dispatch(updateBatchStatus(i, {
+                status : MultisendBatchStatus.ERROR,
+                message : error.message
+              }))
+              dispatch(approvalDenied())
+            });
+        // }).catch(e => {
+        //   dispatch(updateBatchStatus(i, {
+        //     status : MultisendBatchStatus.ERROR,
+        //     message : 'Gas estimation failed, this means that there is a problem with this transaction'
+        //   }))
+        // })
+
+        
+      })
+    })
+  }
 }
 
 export const approvalDenied = () => {

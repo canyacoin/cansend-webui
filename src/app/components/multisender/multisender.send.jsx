@@ -7,7 +7,7 @@ import jump from 'jump.js'
 import Units from 'ethereumjs-units'
 import { Button, Icon, IconType, FormlessInput } from 'app.elements'
 import { processTransactions, fetchAccountData, accountUpdate, summariseTransactions } from 'app/app.store.action'
-import { MultisendBatchStatus, MultisendTokenStatus } from 'app/app.store.reducer'
+import { MultisendBatchStatus, MultisendApprovalStatus, MultisendTokenStatus } from 'app/app.store.reducer'
 import './multisender.send.scss';
 import 'react-circular-progressbar/dist/styles.css';
 import well_done from 'app.images/well_done.svg'
@@ -55,6 +55,47 @@ const PanelComplete = ({multisend}) => (
 		<Link to={'/'} className="element button">Start Again</Link>
 	</div>
 )
+
+const PanelApprovalProgress = ({multisend}) => {
+
+	let sent_confirmed_count = multisend.summary.approvals.filter( approval => approval.status === MultisendApprovalStatus.SENT || approval.status === MultisendApprovalStatus.CONFIRMED).length
+	
+	let sent_pct = 100 / multisend.summary.approvals.length * sent_confirmed_count
+	let confirmed_pct = 100 / multisend.summary.approvals.length * multisend.summary.approvals.filter( approval => approval.status === MultisendApprovalStatus.CONFIRMED).length
+
+	return <div className="approval-progress">
+		<p>Please wait until you sign {multisend.summary.approvals.length} approval transactions in metamask</p>
+		
+		<div className="circles">
+			<CircularProgressbar 
+				percentage={ sent_pct } 
+				className={'progresscircle -send'} 
+				strokeWidth={10} 
+				styles={{
+					path: { stroke: '#f0b42d' },
+					trail: { stroke: '#f0fbff' },
+					text : {fill: '#535353'}
+				}}
+				textForPercentage={(pct) => `${sent_confirmed_count}/${multisend.summary.approvals.length} sent`}
+			/>
+
+			<CircularProgressbar 
+				percentage={ confirmed_pct } 
+				className={'progresscircle -confirmed'} 
+				strokeWidth={10} 
+				styles={{
+					path: { stroke: '#4decca' },
+					trail: { stroke: 'rgba(255,255,255,0)' },
+					text : {fill: '#535353'}
+				}}
+				textForPercentage={(pct) => `${Math.round(confirmed_pct)}%`}
+				
+			/>
+		</div>
+
+		<p className="light">Listening to approvals on metamask...</p>
+	</div>
+}
 
 const PanelProgress = ({multisend}) => {
 
@@ -243,7 +284,9 @@ class Send extends React.Component{
 
 	componentWillReceiveProps(nextProps){
 		if(nextProps === this.props) return;
-		
+    
+    if(nextProps.multisend.summary.status == MultisendSummaryStatus.PROCESSING)
+
 		this.setState({
 			status : nextProps.multisend.summary.status
 		})

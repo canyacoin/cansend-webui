@@ -12,7 +12,8 @@
 		color: $color-greyish-brown
 	}
 	
-	.progress,
+  .progress,
+  .approval-progress,
 	.overview,
 	.summary,
 	.complete{
@@ -44,7 +45,8 @@
 		}
 	}
 
-	.progress{
+  .progress,
+  .approval-progress{
 		text-align: center;
 		
 
@@ -318,6 +320,24 @@
 			max-height: 2000vh;
 		}
 
+		.overview{
+			border-bottom-width: 1px;
+		}
+	}
+
+	&[data-status="processing-approvals"]{
+		.approval-progress,
+		.overview,
+		.summary{
+			padding: 3rem 0;
+			max-height: 100vh;
+		}
+
+		.summary{
+			max-height: 300vh;
+		}
+
+		.progress,
 		.overview{
 			border-bottom-width: 1px;
 		}

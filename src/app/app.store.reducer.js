@@ -25,9 +25,17 @@ export const HistoryStatus = {
 
 export const MultisendSummaryStatus = {
 	INITIALIZED : 'initialized',
+	PROCESSING_APPROVALS : 'processing-approvals',
 	PROCESSING : 'processing',
 	COMPLETE : 'complete',
 	ERROR : 'error'
+};
+
+export const MultisendApprovalStatus = {
+	PENDING : 'pending',
+	SENT : 'sent',
+	CONFIRMED : 'confirmed',
+	ERROR : 'failed'
 };
 
 export const MultisendBatchStatus = {
@@ -222,6 +230,30 @@ const appReducer = (state, action) => {
 						...state.multisend.summary,
 						status : status,
 						batches : batches
+					}
+				}
+			}
+		case "APP.TRANSACTION.APPROVAL.UPDATE":
+
+			// iterate approvals and append new data
+			let approvals = state.multisend.summary.approvals.map( (approval, i) => {
+				if(i === action.index) return { ...approval, ...action.data }
+				return approval
+			})
+
+			// check all approval statuses
+			let status = MultisendSummaryStatus.INITIALIZED
+			let statuses = approvals.map( approval => approval.status ).filter( (elem, pos, arr) => { return arr.indexOf(elem) === pos } );
+
+			return {
+				...state,
+				multisend : {
+					...state.multisend,
+					recipients : status === MultisendSummaryStatus.COMPLETE ? initialState.multisend.recipients : state.multisend.recipients,
+					summary : {
+						...state.multisend.summary,
+						status : status,
+						approvals : approvals
 					}
 				}
 			}
