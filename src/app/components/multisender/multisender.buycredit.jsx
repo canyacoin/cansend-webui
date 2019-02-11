@@ -75,8 +75,8 @@ class BuyCredit extends React.Component{
 			throw new Error('CAN/ETH conversion rate has not yet been calculated.')
 		}
 
-		const canToBuy = Number(canAmount) + 0.5
-		const ethNecessaryToBuyCan = this.state.ethPrice * canToBuy
+		const canToBuy = Number(canAmount)
+		const ethNecessaryToBuyCan = this.state.ethPrice * (canToBuy * 1.02)
 		const weiNecessary = Units.convert(ethNecessaryToBuyCan, 'eth', 'wei')
 		const response = await fetch('https://api.bancor.network/0.1/currencies/convert', {
 			headers: {
@@ -86,7 +86,7 @@ class BuyCredit extends React.Component{
 			body: JSON.stringify({
 				'blockchainType': 'ethereum',
 			  'amount': weiNecessary,
-			  'minimumReturn': canToBuy,
+			  'minimumReturn': canToBuy * (10 ** config.can_decimals),
 			  'ownerAddress': userAddress,
 			  'fromCurrencyId': '5937d635231e97001f744267',
 			  'toCurrencyId': '5a6f61ece3de16000123763a'
