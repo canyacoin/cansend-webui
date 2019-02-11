@@ -12,22 +12,24 @@ import eth_logo from 'app.images/eth_logo.svg'
 import can_logo from 'app.images/can_logo.svg'
 import arrow from 'app.images/arrow.svg'
 
+const canPer10 = 25
+
 class BuyCredit extends React.Component{
 	
 	constructor(props){
 		super(props);
 
 		this.canAmountOptions = [
-			{value : 1, label : '1 CAN'},
-			{value : 5, label : '5 CAN'},
-			{value : 10, label : '10 CAN'},
-			{value : 15, label : '15 CAN'},
+			{value : 1 * canPer10, label : `${1 * canPer10} CAN`},
+			{value : 5 * canPer10, label : `${5 * canPer10} CAN`},
+			{value : 10 * canPer10, label : `${10 * canPer10} CAN`},
+			{value : 15 * canPer10, label : `${15 * canPer10} CAN`},
 		]
 
 		this.state = {
 			ethPrice : null,
 			canBalance : this.props.account.balance_can,
-			canSelected : 5,
+			canSelected : (5 * canPer10),
 			waiting: false,
 			bancorTxHash: null
 		}
@@ -169,7 +171,7 @@ class BuyCredit extends React.Component{
 
 			<FormlessSelect label='' name='can_amount' default={this.state.canSelected} options={this.canAmountOptions} onChange={e => this.setState({canSelected : e.value})}/>
 
-			<p className="can-calculation">With this amount of CAN you can send to {this.state.canSelected * config.address_per_can} addresses</p>
+			<p className="can-calculation">With this amount of CAN you can send to {(this.state.canSelected / canPer10) * config.address_per_can} addresses</p>
 
 			<div className="can-purchase-button">
 				<Button to="#" onClick={async () => {
