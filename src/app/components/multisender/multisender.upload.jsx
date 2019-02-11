@@ -125,7 +125,7 @@ class TokenForm extends React.Component{
 						</FormlessRow>
 
 						<FormlessRow className={'controls'}>
-							<span className="contract-link">CanSend Address: <a target="_blank" href={'https://' + (config.network === 42 ? 'kovan.' : '') + 'etherscan.io/address/' + Contracts.Multisender.address}>{Contracts.Multisender.address}</a><br/>1 CAN per {config.address_per_can} Addresses</span>
+							<span className="contract-link">CanSend Address: <a target="_blank" href={'https://' + (config.network === 42 ? 'kovan.' : '') + 'etherscan.io/address/' + Contracts.Multisender.address}>{Contracts.Multisender.address}</a><br/>25 CAN per {config.address_per_can} Addresses</span>
 							<FormlessSubmit label='Next'/>
 						</FormlessRow>
 					</Formless>

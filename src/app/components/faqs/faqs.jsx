@@ -9,7 +9,7 @@ const faqItems = [
 	},
 	{
 		q : 'How much does it cost?',
-		a : 'It costs 1 CAN to send to 10 Addresses '
+		a : 'It costs 25 CAN to send to 10 Addresses '
 	},
 	{
 		q : 'How do I use this tool?',

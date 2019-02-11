@@ -306,13 +306,13 @@ export const summariseTransactions = () => {
 	return async (dispatch, getState) => {
 
 		let state = getState();
-    let token_count = countTokens(state.multisend.recipients, state.multisend.token_decimal)
+    	let token_count = countTokens(state.multisend.recipients, state.multisend.token_decimal)
 		let batches = batchRecipients(state.multisend.recipients, state.multisend.token_decimal, config.tx_batch_size || 150);
 
 		dispatch(setSummary({
 			from_token_address : state.multisend.token_address,
 			from_token_decimal : state.multisend.token_decimal,
-			can_fee : Math.floor(state.multisend.recipients.length / config.address_per_can),
+			can_fee : Math.floor(state.multisend.recipients.length / config.address_per_can) * 25,
 			address_count : state.multisend.recipients.length,
 			token_count_int : token_count.int,
 			token_count_bn : token_count.bn,

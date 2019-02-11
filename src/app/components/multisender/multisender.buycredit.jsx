@@ -127,7 +127,7 @@ class BuyCredit extends React.Component{
 	}
 
 	render () {
-		let min_credit = Math.floor(this.props.multisend.recipients.length / config.address_per_can);
+		let min_credit = Math.floor(this.props.multisend.recipients.length / config.address_per_can) * 25;
 		const enoughCredit = (this.props.account.balance_can / Math.pow(10, 6)) < min_credit
 		return enoughCredit
 			? this.render_notEnoughCredit(min_credit)
