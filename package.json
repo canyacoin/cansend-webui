@@ -41,7 +41,7 @@
     "react-addons-css-transition-group": "^15.6.2",
     "react-circular-progressbar": "^0.8.0",
     "react-color": "^2.14.1",
-    "react-dev-utils": "^5.0.1",
+    "react-dev-utils": "^11.0.4",
     "react-dom": "^16.3.2",
     "react-dropzone": "^4.2.9",
     "react-hot-loader": "^4.1.1",
